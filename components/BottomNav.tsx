@@ -1,52 +1,52 @@
 import React from 'react';
-import { View } from '../types';
-import { HomeIcon, ListIcon, PlusIcon, StatsIcon, SettingsIcon, AnalyseIcon } from './Icons';
+import { View } from '../types.ts';
+import { HomeIcon, ListIcon, PlusIcon, ChartBarIcon, BeakerIcon, CogIcon } from './Icons.tsx';
 
 interface BottomNavProps {
-  currentView: View;
+  view: View;
   setView: (view: View) => void;
 }
 
-const BottomNav: React.FC<BottomNavProps> = ({ currentView, setView }) => {
-  // FIX: Replaced `JSX.Element` with `React.ReactElement` to fix "Cannot find namespace 'JSX'" error.
-  const navItems: { view: View; label: string; icon: React.ReactElement }[] = [
-    { view: 'home', label: 'Accueil', icon: <HomeIcon /> },
-    { view: 'list', label: 'Liste', icon: <ListIcon /> },
-    { view: 'add', label: 'Ajouter', icon: <PlusIcon /> },
-    { view: 'stats', label: 'Stats', icon: <StatsIcon /> },
-    { view: 'analyse', label: 'Analyse', icon: <AnalyseIcon /> },
-    { view: 'dataTools', label: 'Outils', icon: <SettingsIcon /> },
+const BottomNav: React.FC<BottomNavProps> = ({ view, setView }) => {
+  const navItems = [
+    { name: 'home', icon: HomeIcon, label: 'Accueil' },
+    { name: 'list', icon: ListIcon, label: 'Liste' },
+    { name: 'add', icon: PlusIcon, label: 'Ajouter' },
+    { name: 'stats', icon: ChartBarIcon, label: 'Stats' },
+    { name: 'analyse', icon: BeakerIcon, label: 'Analyse' },
+    { name: 'dataTools', icon: CogIcon, label: 'Outils' },
   ];
 
+  const NavButton: React.FC<{item: typeof navItems[0]}> = ({ item }) => {
+    const isActive = view === item.name;
+    if (item.name === 'add') {
+      return (
+         <button
+            onClick={() => setView('add')}
+            className="relative -top-4 bg-blue-600 text-white p-4 rounded-full shadow-lg"
+        >
+            <PlusIcon className="h-6 w-6" />
+        </button>
+      )
+    }
+    return (
+      <button
+        onClick={() => setView(item.name as View)}
+        className={`flex flex-col items-center justify-center w-full pt-2 pb-1 text-xs ${
+          isActive ? 'text-blue-500' : 'text-gray-400'
+        }`}
+      >
+        <item.icon className="h-6 w-6 mb-1" />
+        <span>{item.label}</span>
+      </button>
+    )
+  }
+
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-800 text-white flex justify-around p-1 shadow-inner z-20">
-      {navItems.map(({ view, label, icon }) => {
-        if (view === 'add') {
-            return (
-                 <button
-                    key={view}
-                    onClick={() => setView(view)}
-                    className="relative -top-4 bg-indigo-600 text-white rounded-full p-4 shadow-lg"
-                    aria-label={label}
-                >
-                    <PlusIcon />
-                </button>
-            )
-        }
-        return (
-            <button
-            key={view}
-            onClick={() => setView(view)}
-            className={`flex flex-col items-center justify-center text-xs w-16 h-14 rounded-md transition-colors ${
-                currentView === view ? 'text-indigo-400' : 'text-slate-400 hover:text-white'
-            }`}
-            aria-label={label}
-            >
-            {icon}
-            <span className="mt-1">{label}</span>
-            </button>
-        )
-      })}
+    <nav className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 grid grid-cols-6 md:hidden">
+      {navItems.map(item => (
+        <NavButton key={item.name} item={item} />
+      ))}
     </nav>
   );
 };
