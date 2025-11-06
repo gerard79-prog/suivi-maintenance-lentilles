@@ -18,27 +18,18 @@
 <script type="importmap">
 {
   "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "firebase/app": "https://aistudiocdn.com/firebase@^12.5.0/app",
-    "firebase/firestore": "https://aistudiocdn.com/firebase@^12.5.0/firestore",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
     "firebase/": "https://aistudiocdn.com/firebase@^12.5.0/",
-    "chart.js": "https://aistudiocdn.com/chart.js@^4.5.1",
-    "chart.js/auto": "https://aistudiocdn.com/chart.js@^4.5.1/auto",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.28.0",
-    "react-markdown": "https://aistudiocdn.com/react-markdown@^10.1.0",
     "chart.js/": "https://aistudiocdn.com/chart.js@^4.5.1/"
   }
 }
 </script>
-<!-- Add Babel to transpile JSX in the browser -->
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body class="antialiased">
   <div id="root"></div>
-<!-- Change script type to text/babel for transpilation, and add presets for react and typescript -->
-<script type="text/babel" data-presets="react,typescript" data-type="module" src="/index.tsx"></script>
+  <script type="module" src="/index.tsx"></script>
 </body>
 </html>
