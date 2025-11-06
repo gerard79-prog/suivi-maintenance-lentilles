@@ -1,69 +1,90 @@
 import React, { useState, useEffect } from 'react';
-import { Intervention, NewIntervention, View } from './types';
-import { useLocalStorage } from './hooks/useLocalStorage';
+import { db } from './firebaseConfig.ts';
+import { collection, onSnapshot, addDoc, deleteDoc, doc, getDocs, writeBatch } from 'firebase/firestore';
+import { Intervention, NewIntervention, Stats, View } from './types.ts';
 
-// Import views
-import HomeView from './views/HomeView';
-import ListView from './views/ListView';
-import AddView from './views/AddView';
-import StatsView from './views/StatsView';
-import DataToolsView from './views/DataToolsView';
-import AnalyseView from './views/AnalyseView';
+import Header from './components/Header.tsx';
+import BottomNav from './components/BottomNav.tsx';
+import DesktopNav from './components/DesktopNav.tsx';
+import HomeView from './views/HomeView.tsx';
+import ListView from './views/ListView.tsx';
+import AddView from './views/AddView.tsx';
+import StatsView from './views/StatsView.tsx';
+import DataToolsView from './views/DataToolsView.tsx';
+import AnalyseView from './views/AnalyseView.tsx';
 
-// Import components
-import DesktopNav from './components/DesktopNav';
-import BottomNav from './components/BottomNav';
-import Header from './components/Header';
-
-// FIX: This file had placeholder content, causing build errors. It has been replaced with the main application component.
-function App() {
-  const [interventions, setInterventions] = useLocalStorage<Intervention[]>('interventions', []);
-  const [view, setView] = useLocalStorage<View>('currentView', 'home');
-  const [isReady, setIsReady] = useState(false);
+const App: React.FC = () => {
+  const [view, setView] = useState<View>('home');
+  const [interventions, setInterventions] = useState<Intervention[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // This effect helps prevent hydration mismatches if this app were to be server-rendered.
-    // It ensures that localStorage is only accessed on the client.
-    setIsReady(true);
-  }, []);
+    const timeout = setTimeout(() => {
+      if (loading) {
+        setError("Le chargement des données prend trop de temps. Vérifiez les règles de sécurité de votre base de données Firestore. Elles doivent autoriser la lecture ('allow read: if true;').");
+        setLoading(false);
+      }
+    }, 10000);
 
-  const addIntervention = async (intervention: NewIntervention) => {
-    const newIntervention: Intervention = {
-      ...intervention,
-      id: new Date().toISOString() + Math.random().toString(36).substring(2, 9),
-    };
-    // Add new intervention and re-sort by date
-    const updatedInterventions = [newIntervention, ...interventions];
-    updatedInterventions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    setInterventions(updatedInterventions);
-    setView('list'); 
-  };
+    const unsubscribe = onSnapshot(collection(db, 'interventions'), (snapshot) => {
+      clearTimeout(timeout);
+      const interventionsData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Intervention));
+      interventionsData.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      setInterventions(interventionsData);
+      setLoading(false);
+      setError(null);
+    }, (err) => {
+      clearTimeout(timeout);
+      console.error("Firebase read error:", err);
+      setError("Erreur de connexion à la base de données. Vérifiez votre connexion et les règles de sécurité Firestore.");
+      setLoading(false);
+    });
+
+    return () => {
+      clearTimeout(timeout);
+      unsubscribe();
+    }
+  }, []);
   
-  const deleteIntervention = (id: string) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette intervention ?')) {
-      setInterventions(interventions.filter(i => i.id !== id));
+  const addIntervention = async (intervention: NewIntervention) => {
+    await addDoc(collection(db, 'interventions'), intervention);
+  };
+
+  const deleteIntervention = async (id: string) => {
+    if (window.confirm("Êtes-vous sûr de vouloir supprimer cette intervention ?")) {
+      await deleteDoc(doc(db, 'interventions', id));
+    }
+  };
+
+  const handleDeleteAllInterventions = async () => {
+    if (window.confirm("Êtes-vous VRAIMENT sûr de vouloir supprimer TOUTES les données ? Cette action est irréversible.")) {
+      const querySnapshot = await getDocs(collection(db, 'interventions'));
+      const batch = writeBatch(db);
+      querySnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
     }
   };
 
   const handleImportInterventions = async (importedInterventions: NewIntervention[]) => {
-    const newInterventions: Intervention[] = importedInterventions.map((i, index) => ({
-      ...i,
-      id: new Date().toISOString() + Math.random().toString(36).substring(2, 9) + index,
-    }));
-    const updatedInterventions = [...interventions, ...newInterventions];
-    updatedInterventions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    setInterventions(updatedInterventions);
-  };
-
-  const handleDeleteAllInterventions = async () => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer TOUTES les interventions ? Cette action est irréversible.")) {
-      setInterventions([]);
-      alert("Toutes les interventions ont été supprimées.");
-    }
+    const batch = writeBatch(db);
+    importedInterventions.forEach(intervention => {
+      const docRef = doc(collection(db, 'interventions'));
+      batch.set(docRef, intervention);
+    });
+    await batch.commit();
   };
 
 
   const renderView = () => {
+    if (loading) return <div className="flex justify-center items-center h-full"><p className="text-gray-500">Chargement des données...</p></div>;
+    if (error) return <div className="flex justify-center items-center h-full p-4"><p className="text-red-500 bg-red-100 p-4 rounded-lg">{error}</p></div>;
+    
     switch (view) {
       case 'home':
         return <HomeView interventions={interventions} />;
@@ -74,7 +95,7 @@ function App() {
       case 'stats':
         return <StatsView interventions={interventions} />;
       case 'dataTools':
-        return <DataToolsView interventions={interventions} handleImportInterventions={handleImportInterventions} handleDeleteAllInterventions={handleDeleteAllInterventions} />;
+        return <DataToolsView interventions={interventions} handleImport={handleImportInterventions} handleDeleteAll={handleDeleteAllInterventions} />;
       case 'analyse':
         return <AnalyseView interventions={interventions} />;
       default:
@@ -82,22 +103,18 @@ function App() {
     }
   };
 
-  if (!isReady) {
-    return null; // Render nothing until client-side hydration is complete
-  }
-
   return (
-    <div className="bg-slate-100 min-h-screen font-sans">
-      <DesktopNav currentView={view} setView={setView} />
-      <div className="md:ml-64">
-        <Header currentView={view} />
-        <main className="p-4 sm:p-6 pb-24 md:pb-6">
+    <div className="flex h-screen bg-gray-100 font-sans">
+      <DesktopNav view={view} setView={setView} />
+      <div className="flex-1 flex flex-col">
+        <Header view={view} />
+        <main className="flex-1 p-4 sm:p-6 overflow-y-auto pb-24 md:pb-6">
           {renderView()}
         </main>
+        <BottomNav view={view} setView={setView} />
       </div>
-      <BottomNav currentView={view} setView={setView} />
     </div>
   );
-}
+};
 
 export default App;
