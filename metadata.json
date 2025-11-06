@@ -1,0 +1,5 @@
+{
+  "name": "Suivi Maintenance Lentilles",
+  "description": "Une application pour suivre la maintenance des lentilles laser. Gérez, suivez et analysez l'historique des interventions de maintenance de vos lentilles laser en toute simplicité. Accessible depuis un PC ou un téléphone, avec une synchronisation automatique et en temps réel.",
+  "requestFramePermissions": []
+}
