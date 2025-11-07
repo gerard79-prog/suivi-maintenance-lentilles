@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { NewIntervention, View } from '../types.ts';
-import { MACHINES_LIST, INTERVENANTS_LIST, MACHINE_TO_LENTILLE_MAP } from '../constants.ts';
+import { NewIntervention, View } from '../types';
+import { MACHINES_LIST, INTERVENANTS_LIST, MACHINE_TO_LENTILLE_MAP } from '../constants';
 
 interface AddViewProps {
   addIntervention: (intervention: NewIntervention) => void;
