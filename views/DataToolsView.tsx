@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { Intervention, NewIntervention } from '../types.ts';
-import { UploadIcon, DownloadIcon, TrashIcon } from '../components/Icons.tsx';
+import { Intervention, NewIntervention } from '../types';
+import { UploadIcon, DownloadIcon, TrashIcon } from '../components/Icons';
 
 interface DataToolsViewProps {
   interventions: Intervention[];
