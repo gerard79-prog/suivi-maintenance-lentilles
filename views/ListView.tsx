@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Intervention } from '../types.ts';
-import { TrashIcon } from '../components/Icons.tsx';
-import { MACHINES_LIST, INTERVENANTS_LIST } from '../constants.ts';
+import { Intervention } from '../types';
+import { TrashIcon } from '../components/Icons';
+import { MACHINES_LIST, INTERVENANTS_LIST } from '../constants';
 
 interface ListViewProps {
   interventions: Intervention[];
