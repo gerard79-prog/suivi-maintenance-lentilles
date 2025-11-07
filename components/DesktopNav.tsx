@@ -1,6 +1,6 @@
 import React from 'react';
-import { View } from '../types.ts';
-import { HomeIcon, ListIcon, PlusIcon, ChartBarIcon, BeakerIcon, CogIcon } from './Icons.tsx';
+import { View } from '../types';
+import { HomeIcon, ListIcon, PlusIcon, ChartBarIcon, BeakerIcon, CogIcon } from './Icons';
 
 interface DesktopNavProps {
   view: View;
