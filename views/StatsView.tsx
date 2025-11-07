@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, useRef } from 'react';
-import { Intervention } from '../types.ts';
+import { Intervention } from '../types';
 import Chart from 'chart.js/auto';
 
 interface StatsViewProps {
