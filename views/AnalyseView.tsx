@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Intervention } from '../types.ts';
+import { Intervention } from '../types';
 import { GoogleGenAI } from '@google/genai';
-import { useLocalStorage } from '../hooks/useLocalStorage.ts';
-import { FileTextIcon } from '../components/Icons.tsx';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { FileTextIcon } from '../components/Icons';
 
 interface AnalyseViewProps {
   interventions: Intervention[];
