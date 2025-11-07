@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Intervention } from '../types';
-import { GoogleGenAI } from '@google/genai';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { FileTextIcon } from '../components/Icons';
 
@@ -26,7 +25,6 @@ const AnalyseView: React.FC<AnalyseViewProps> = ({ interventions }) => {
     setAnalysis('');
 
     try {
-      const ai = new GoogleGenAI({ apiKey });
       const dataSummary = JSON.stringify(interventions);
       
       const prompt = `
@@ -37,12 +35,32 @@ const AnalyseView: React.FC<AnalyseViewProps> = ({ interventions }) => {
         Structure ta réponse en Markdown.
       `;
       
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt
+      // Utilisation correcte de l'API Gemini
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }]
+        })
       });
 
-      setAnalysis(response.text);
+      if (!response.ok) {
+        throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+        setAnalysis(data.candidates[0].content.parts[0].text);
+      } else {
+        throw new Error("Format de réponse inattendu de l'API");
+      }
 
     } catch (e) {
       console.error(e);
