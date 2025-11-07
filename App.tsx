@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { db } from './firebaseConfig.ts';
+import { db } from './firebaseConfig';
 import { collection, onSnapshot, addDoc, deleteDoc, doc, getDocs, writeBatch } from 'firebase/firestore';
-import { Intervention, NewIntervention, Stats, View } from './types.ts';
+import { Intervention, NewIntervention, Stats, View } from './types';
 
-import Header from './components/Header.tsx';
-import BottomNav from './components/BottomNav.tsx';
-import DesktopNav from './components/DesktopNav.tsx';
-import HomeView from './views/HomeView.tsx';
-import ListView from './views/ListView.tsx';
-import AddView from './views/AddView.tsx';
-import StatsView from './views/StatsView.tsx';
-import DataToolsView from './views/DataToolsView.tsx';
-import AnalyseView from './views/AnalyseView.tsx';
+import Header from './components/Header';
+import BottomNav from './components/BottomNav';
+import DesktopNav from './components/DesktopNav';
+import HomeView from './views/HomeView';
+import ListView from './views/ListView';
+import AddView from './views/AddView';
+import StatsView from './views/StatsView';
+import DataToolsView from './views/DataToolsView';
+import AnalyseView from './views/AnalyseView';
 
 const App: React.FC = () => {
   const [view, setView] = useState<View>('home');
