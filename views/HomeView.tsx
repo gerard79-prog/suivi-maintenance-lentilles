@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Intervention } from '../types.ts';
+import { Intervention } from '../types';
 
 interface HomeViewProps {
   interventions: Intervention[];
