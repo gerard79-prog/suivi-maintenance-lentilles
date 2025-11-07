@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from '../types.ts';
+import { View } from '../types';
 
 interface HeaderProps {
   view: View;
